@@ -13,7 +13,8 @@ export default async function routesWithValidation(fastify: FastifyInstance, _op
     },
   };
 
-  fastify.post('/api/is-valid', opts, async (_request, _reply) => {
+  fastify.post('/api/is-valid', opts, async (request, _reply) => {
+    console.log('request.body is:', request.body);
     return { valid: true };
   });
 }
