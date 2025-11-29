@@ -1,5 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import { HealthCheckModule } from './modules/health-check/health-check.module';
+import ourFirstRoute from './modules/our-first-route';
+import routesWithValidation from './modules/routes-with-validation';
 
 async function start() {
   const server: FastifyInstance = Fastify({});
@@ -7,7 +9,10 @@ async function start() {
   try {
     HealthCheckModule.getInstance().attachController(server);
 
-    await server.listen({ port: 3000 });
+    server.register(ourFirstRoute);
+    server.register(routesWithValidation);
+
+    await server.listen({ port: 8000 });
 
     const address = server.server.address();
     const port = typeof address === 'string' ? address : address?.port;
