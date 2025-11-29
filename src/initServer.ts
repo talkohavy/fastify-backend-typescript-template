@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { HealthCheckModule } from './modules/health-check/health-check.module';
 import ourFirstRoute from './modules/our-first-route';
 import routesWithValidation from './modules/routes-with-validation';
+import routesWithSerialization from './modules/routes-with-serialization';
 
 async function start() {
   const server: FastifyInstance = Fastify({});
@@ -11,6 +12,7 @@ async function start() {
 
     server.register(ourFirstRoute);
     server.register(routesWithValidation);
+    server.register(routesWithSerialization);
 
     await server.listen({ port: 8000 });
 
