@@ -1,36 +1,22 @@
-import Fastify, { type FastifyInstance, type RouteShorthandOptions } from 'fastify';
+import Fastify, { type FastifyInstance } from 'fastify';
+import { HealthCheckModule } from './modules/health-check/health-check.module';
 
-const server: FastifyInstance = Fastify({});
+async function start() {
+  const server: FastifyInstance = Fastify({});
 
-const opts: RouteShorthandOptions = {
-  schema: {
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          pong: {
-            type: 'string',
-          },
-        },
-      },
-    },
-  },
-};
-
-server.get('/ping', opts, async (_request, _replyy) => {
-  return { pong: 'it worked!' };
-});
-
-const start = async () => {
   try {
+    HealthCheckModule.getInstance().attachController(server);
+
     await server.listen({ port: 3000 });
 
     const address = server.server.address();
     const port = typeof address === 'string' ? address : address?.port;
+
+    console.log(`Server is running on port ${port}`);
   } catch (err) {
     server.log.error(err);
     process.exit(1);
   }
-};
+}
 
 start();
