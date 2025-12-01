@@ -12,7 +12,7 @@ export class HealthCheckController implements ControllerFactory {
           200: {
             type: 'object',
             properties: {
-              pong: {
+              status: {
                 type: 'string',
               },
             },
