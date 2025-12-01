@@ -12,15 +12,9 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    name: 'react-compiler/recommended',
     plugins: {
       perfectionist,
     },
-    rules: {
-      'react-compiler/react-compiler': 'error',
-    },
-  },
-  {
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
