@@ -14,7 +14,7 @@ export class HealthCheckModule implements ModuleFactory {
     return HealthCheckModule.instance;
   }
 
-  attachController(app: FastifyInstance): void {
+  registerController(app: FastifyInstance): void {
     const controller = new HealthCheckController(app);
 
     controller.attachRoutes();

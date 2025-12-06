@@ -27,7 +27,7 @@ export async function buildApp(options?: AppOptions) {
     credentials: true, // <--- Required! When a client request has `include:'credentials'`, this option must be set to true. Otherwise, the request will be blocked.
   });
 
-  HealthCheckModule.getInstance().attachController(app);
+  HealthCheckModule.getInstance().registerController(app);
 
   app.register(ourFirstRoute);
   app.register(routesWithBodySerialization);

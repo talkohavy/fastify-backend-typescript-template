@@ -3,6 +3,6 @@ export interface StaticModule {
 }
 
 export interface ModuleFactory {
-  attachController(app: any): void;
+  registerController(app: any): void;
   attachEventHandlers?(io: any): void;
 }
