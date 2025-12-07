@@ -7,6 +7,7 @@ import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
 import { routesWithBodySerialization } from './modules/routes-with-body-serialization';
 import { routesWithBodyValidation } from './modules/routes-with-body-validation';
 import { routesWithResponseSerialization } from './modules/routes-with-response-serialization';
+import { ValidationExamplesModule } from './modules/validation-examples';
 
 const allowedOrigins = ['http://localhost:3000'];
 
@@ -28,6 +29,7 @@ export async function buildApp(options?: AppOptions) {
   });
 
   HealthCheckModule.getInstance().registerController(app);
+  ValidationExamplesModule.getInstance().registerController(app);
 
   app.register(ourFirstRoute);
   app.register(routesWithBodySerialization);
