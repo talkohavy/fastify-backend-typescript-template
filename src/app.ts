@@ -53,5 +53,17 @@ export async function buildApp(options?: AppOptions) {
   app.register(routesWithBodyValidation);
   app.register(routesWithAbortCleanup);
 
+  // app.ready(() => {
+  //   console.log(
+  //     app.printRoutes({
+  //       commonPrefix: true, // <--- defaults to true.
+  //       // method: 'GET', // <--- defaults to undefined. only show routes for the method X.
+  //       // includeMeta: true, // <--- defaults to false. include the route meta object.
+  //     }),
+  //   );
+
+  //   console.error(app.printPlugins());
+  // });
+
   return app;
 }
