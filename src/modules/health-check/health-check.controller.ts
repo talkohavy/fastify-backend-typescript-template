@@ -5,7 +5,7 @@ import { API_URLS } from '../../common/constants';
 export class HealthCheckController implements ControllerFactory {
   constructor(private readonly app: FastifyInstance) {}
 
-  private healthCheck() {
+  private healthCheck(app: FastifyInstance) {
     const options: RouteShorthandOptions = {
       schema: {
         response: {
@@ -21,12 +21,12 @@ export class HealthCheckController implements ControllerFactory {
       },
     };
 
-    this.app.get(API_URLS.healthCheck, options, async (_req, _reply) => {
+    app.get(API_URLS.healthCheck, options, async (_req, _reply) => {
       return { status: 'OK' };
     });
   }
 
   registerRoutes() {
-    this.healthCheck();
+    this.app.register(this.healthCheck);
   }
 }

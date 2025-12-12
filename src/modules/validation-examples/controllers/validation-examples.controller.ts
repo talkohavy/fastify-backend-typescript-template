@@ -11,7 +11,7 @@ const logger = {
 export class ValidationExamplesController implements ControllerFactory {
   constructor(private readonly app: FastifyInstance) {}
 
-  private validateBodyByJson() {
+  private validateBodyByJson(app: FastifyInstance) {
     const bodyJsonSchema = {
       type: 'object',
       required: ['requiredKey'],
@@ -45,7 +45,7 @@ export class ValidationExamplesController implements ControllerFactory {
       body: bodyJsonSchema,
     };
 
-    this.app.post(API_URLS.validateBodyByJson, { schema }, async (req, _res) => {
+    app.post(API_URLS.validateBodyByJson, { schema }, async (req, _res) => {
       const { body } = req;
 
       logger.info('POST /api/validation/validate-body-by-json - validating body by json');
@@ -54,7 +54,7 @@ export class ValidationExamplesController implements ControllerFactory {
     });
   }
 
-  private validateQueryParamsByJson() {
+  private validateQueryParamsByJson(app: FastifyInstance) {
     const queryStringJsonSchema = {
       type: 'object',
       properties: {
@@ -67,7 +67,7 @@ export class ValidationExamplesController implements ControllerFactory {
       querystring: queryStringJsonSchema,
     };
 
-    this.app.get(API_URLS.validateQueryParamsByJson, { schema }, async (req, _res) => {
+    app.get(API_URLS.validateQueryParamsByJson, { schema }, async (req, _res) => {
       const { query } = req;
 
       logger.info('GET /api/validation/validate-query-params-by-json - validating query params by json');
@@ -76,7 +76,7 @@ export class ValidationExamplesController implements ControllerFactory {
     });
   }
 
-  private validateParamsByJson() {
+  private validateParamsByJson(app: FastifyInstance) {
     const paramsJsonSchema = {
       type: 'object',
       properties: {
@@ -89,7 +89,7 @@ export class ValidationExamplesController implements ControllerFactory {
       params: paramsJsonSchema,
     };
 
-    this.app.get(`${API_URLS.validateParamsByJson}/:part1/:part2`, { schema }, async (req, _res) => {
+    app.get(`${API_URLS.validateParamsByJson}/:part1/:part2`, { schema }, async (req, _res) => {
       const { params } = req;
 
       logger.info('GET /api/validation/validate-params-by-json - validating params by json');
@@ -98,7 +98,7 @@ export class ValidationExamplesController implements ControllerFactory {
     });
   }
 
-  private validateHeadersByJson() {
+  private validateHeadersByJson(app: FastifyInstance) {
     const headersJsonSchema = {
       type: 'object',
       properties: {
@@ -111,7 +111,7 @@ export class ValidationExamplesController implements ControllerFactory {
       headers: headersJsonSchema,
     };
 
-    this.app.post(API_URLS.validateHeadersByJson, { schema }, async (req, _res) => {
+    app.post(API_URLS.validateHeadersByJson, { schema }, async (req, _res) => {
       const { headers } = req;
 
       logger.info('POST /api/validation/validate-headers-by-json - validating headers by json');
@@ -120,8 +120,8 @@ export class ValidationExamplesController implements ControllerFactory {
     });
   }
 
-  private validatePreAddedSchema() {
-    this.app.addSchema({
+  private validatePreAddedSchema(app: FastifyInstance) {
+    app.addSchema({
       $id: 'pre-added-schema',
       type: 'object',
       required: ['email'],
@@ -130,7 +130,7 @@ export class ValidationExamplesController implements ControllerFactory {
       },
     });
 
-    this.app.post(
+    app.post(
       API_URLS.validatePreAddedSchema,
       { schema: { body: { $ref: 'pre-added-schema#' } } },
       async (req, _res) => {
@@ -144,9 +144,11 @@ export class ValidationExamplesController implements ControllerFactory {
   }
 
   /**
-   * DOESN'T WORK AS DOCUMENTATION SAYS!!!
+   * NOTE! This will still be caught by the global error handler!
+   *
+   * It will attach req.validation to the request object, which will be handled by the global error handler.
    */
-  private handleValidationErrorInsideRoute() {
+  private handleValidationErrorInsideRoute(app: FastifyInstance) {
     const opts: RouteShorthandOptions = {
       attachValidation: true, // <--- This is the important part!
       schema: {
@@ -159,7 +161,7 @@ export class ValidationExamplesController implements ControllerFactory {
       },
     };
 
-    this.app.post(API_URLS.handleValidationErrorInsideRoute, opts, async (req, res) => {
+    app.post(API_URLS.handleValidationErrorInsideRoute, opts, async (req, res) => {
       logger.info(`POST ${API_URLS.handleValidationErrorInsideRoute} - handling validation error inside route`);
 
       if (req.validationError) {
@@ -174,11 +176,11 @@ export class ValidationExamplesController implements ControllerFactory {
   }
 
   registerRoutes() {
-    this.validateBodyByJson();
-    this.validateQueryParamsByJson();
-    this.validateParamsByJson();
-    this.validateHeadersByJson();
-    this.validatePreAddedSchema();
-    this.handleValidationErrorInsideRoute();
+    this.app.register(this.validateBodyByJson);
+    this.app.register(this.validateQueryParamsByJson);
+    this.app.register(this.validateParamsByJson);
+    this.app.register(this.validateHeadersByJson);
+    this.app.register(this.validatePreAddedSchema);
+    this.app.register(this.handleValidationErrorInsideRoute);
   }
 }

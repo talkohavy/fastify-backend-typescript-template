@@ -3,7 +3,7 @@ import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
 export class SerializationExamplesController {
   constructor(private readonly app: FastifyInstance) {}
 
-  private serializeResponse() {
+  private serializeResponse(app: FastifyInstance) {
     const opts: RouteShorthandOptions = {
       schema: {
         response: {
@@ -17,12 +17,12 @@ export class SerializationExamplesController {
       },
     };
 
-    this.app.get('/api/response-serialization', opts, async (_request, _reply) => {
+    app.get('/api/response-serialization', opts, async (_request, _reply) => {
       return { message: 'my serialized response', thisKeyWillNotBeSent: 'this key will not be sent' };
     });
   }
 
-  private serializeBody() {
+  private serializeBody(app: FastifyInstance) {
     const opts: RouteShorthandOptions = {
       schema: {
         body: {
@@ -36,14 +36,14 @@ export class SerializationExamplesController {
       },
     };
 
-    this.app.post('/api/body-serialization', opts, async (request, _reply) => {
+    app.post('/api/body-serialization', opts, async (request, _reply) => {
       console.log('request.body is:', request.body);
       return { valid: true, serializedBody: request.body };
     });
   }
 
   registerRoutes() {
-    this.serializeResponse();
-    this.serializeBody();
+    this.app.register(this.serializeResponse);
+    this.app.register(this.serializeBody);
   }
 }
