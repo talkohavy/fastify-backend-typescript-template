@@ -12,6 +12,6 @@ export class HealthCheckModule {
   private attachController(app: any): void {
     const controller = new HealthCheckController(app);
 
-    controller.attachRoutes();
+    controller.registerRoutes();
   }
 }
