@@ -9,6 +9,7 @@ import { routesWithBodyValidation } from './modules/routes-with-body-validation'
 import { SerializationExamplesModule } from './modules/serialization-examples/serialization-examples.module';
 import { ValidationExamplesModule } from './modules/validation-examples';
 import { errorHandlerPlugin } from './plugins/errorHandler.plugin';
+import { pathNotFoundPlugin } from './plugins/pathNotFound.plugin';
 
 const allowedOrigins = ['http://localhost:3000'];
 
@@ -46,6 +47,7 @@ export async function buildApp(options?: AppOptions) {
   );
 
   appModule.registerErrorHandler(errorHandlerPlugin);
+  appModule.registerPathNotFoundHandler(pathNotFoundPlugin);
 
   app.register(ourFirstRoute);
   app.register(routesWithBodyValidation);
