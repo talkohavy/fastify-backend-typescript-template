@@ -3,7 +3,7 @@ import type { ControllerFactory } from '../../lib/lucky-server';
 import { API_URLS } from '../../common/constants';
 
 export class HealthCheckController implements ControllerFactory {
-  constructor(private readonly server: FastifyInstance) {}
+  constructor(private readonly app: FastifyInstance) {}
 
   private healthCheck() {
     const options: RouteShorthandOptions = {
@@ -21,7 +21,7 @@ export class HealthCheckController implements ControllerFactory {
       },
     };
 
-    this.server.get(API_URLS.healthCheck, options, async (_req, _reply) => {
+    this.app.get(API_URLS.healthCheck, options, async (_req, _reply) => {
       return { status: 'OK' };
     });
   }
