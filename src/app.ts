@@ -5,9 +5,8 @@ import { AppFactory } from './lib/lucky-server';
 import { HealthCheckModule } from './modules/health-check/health-check.module';
 import ourFirstRoute from './modules/our-first-route';
 import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
-import { routesWithBodySerialization } from './modules/routes-with-body-serialization';
 import { routesWithBodyValidation } from './modules/routes-with-body-validation';
-import { routesWithResponseSerialization } from './modules/routes-with-response-serialization';
+import { SerializationExamplesModule } from './modules/serialization-examples/serialization-examples.module';
 import { ValidationExamplesModule } from './modules/validation-examples';
 import { errorHandlerPlugin } from './plugins/errorHandler.plugin';
 
@@ -42,15 +41,13 @@ export async function buildApp(options?: AppOptions) {
   ]);
 
   appModule.registerModules(
-    [HealthCheckModule, ValidationExamplesModule],
+    [HealthCheckModule, ValidationExamplesModule, SerializationExamplesModule],
     // optimizedModules,
   );
 
   appModule.registerErrorHandler(errorHandlerPlugin);
 
   app.register(ourFirstRoute);
-  app.register(routesWithBodySerialization);
-  app.register(routesWithResponseSerialization);
   app.register(routesWithBodyValidation);
   app.register(routesWithAbortCleanup);
 
