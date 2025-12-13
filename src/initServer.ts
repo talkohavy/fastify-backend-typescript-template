@@ -1,12 +1,15 @@
 import type { AppOptions } from './types';
 import { buildApp } from './app';
+import { initConnections } from './core';
 
-async function start() {
+async function startServer() {
   const options: AppOptions = {
     logger: {
       level: 'debug',
     },
   };
+
+  await initConnections();
 
   const app = await buildApp(options);
 
@@ -23,4 +26,4 @@ async function start() {
   }
 }
 
-start();
+startServer();
