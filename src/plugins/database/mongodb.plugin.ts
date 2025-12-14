@@ -7,15 +7,19 @@ export const mongodbPlugin = fp(mongodbPluggable, {
   fastify: '5.x',
 });
 
-export type MongoDBPluginOptions = {
-  connectionString: string;
-  maxPoolSize?: number;
-  serverSelectionTimeoutMS?: number;
-  socketTimeoutMS?: number;
-};
+// export type MongoDBPluginOptions = {
+//   connectionString: string;
+//   maxPoolSize?: number;
+//   serverSelectionTimeoutMS?: number;
+//   socketTimeoutMS?: number;
+// };
+// async function mongodbPluggable(fastify: FastifyInstance, options: MongoDBPluginOptions): Promise<void> {
 
-async function mongodbPluggable(fastify: FastifyInstance, options: MongoDBPluginOptions): Promise<void> {
-  const { connectionString, maxPoolSize = 10, serverSelectionTimeoutMS = 5000, socketTimeoutMS = 45000 } = options;
+async function mongodbPluggable(fastify: FastifyInstance): Promise<void> {
+  const connectionString = process.env.DB_CONNECTION_STRING as string;
+  const maxPoolSize = 10;
+  const serverSelectionTimeoutMS = 5000;
+  const socketTimeoutMS = 45000;
 
   if (!connectionString) {
     throw new Error('MongoDB connection string is required');
