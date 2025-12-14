@@ -13,7 +13,6 @@ import { cookiePlugin } from './plugins/cookie';
 import { corsPlugin } from './plugins/cors';
 import { mongodbPlugin, postgresPlugin } from './plugins/database';
 import { errorHandlerPlugin } from './plugins/errorHandler.plugin';
-import { helmetPlugin } from './plugins/helmet';
 import { pathNotFoundPlugin } from './plugins/pathNotFound.plugin';
 import { redisPlugin } from './plugins/redis/redis.plugin';
 
@@ -28,7 +27,7 @@ export async function buildApp(options?: AppOptions) {
     mongodbPlugin,
     corsPlugin,
     cookiePlugin,
-    helmetPlugin,
+    // helmetPlugin, // <--- slows down the server by nearly 50$ !!!
     // requestIdPlugin,
     // bodyLimitPlugin,
     // urlEncodedPlugin,
