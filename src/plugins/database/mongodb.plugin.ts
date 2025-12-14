@@ -16,7 +16,7 @@ export const mongodbPlugin = fp(mongodbPluggable, {
 // async function mongodbPluggable(fastify: FastifyInstance, options: MongoDBPluginOptions): Promise<void> {
 
 async function mongodbPluggable(fastify: FastifyInstance): Promise<void> {
-  const connectionString = process.env.DB_CONNECTION_STRING as string;
+  const connectionString = process.env.MONGODB_CONNECTION_STRING as string;
   const maxPoolSize = 10;
   const serverSelectionTimeoutMS = 5000;
   const socketTimeoutMS = 45000;
