@@ -5,12 +5,12 @@ import { DragonsService } from './services/dragons.service';
 export class DragonsModule {
   private dragonsService!: DragonsService;
 
-  constructor(private readonly app: any) {
+  constructor(private readonly app: FastifyInstance) {
     this.initializeModule();
   }
 
   private initializeModule(): void {
-    this.dragonsService = new DragonsService();
+    this.dragonsService = new DragonsService(this.app.redis);
 
     this.attachController(this.app);
   }
