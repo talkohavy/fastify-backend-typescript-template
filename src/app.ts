@@ -2,7 +2,7 @@ import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { AppOptions } from './types';
 import { AppFactory } from './lib/lucky-server';
-import { DragonsModule } from './modules/dragons/dragons.module';
+import { DragonsModule } from './modules/dragons';
 import { HealthCheckModule } from './modules/health-check';
 import ourFirstRoute from './modules/our-first-route';
 import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
