@@ -3,7 +3,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import type { AppOptions } from './types';
 import { AppFactory } from './lib/lucky-server';
 import { DragonsModule } from './modules/dragons/dragons.module';
-import { HealthCheckModule } from './modules/health-check/health-check.module';
+import { HealthCheckModule } from './modules/health-check';
 import ourFirstRoute from './modules/our-first-route';
 import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
 import { routesWithBodyValidation } from './modules/routes-with-body-validation';
