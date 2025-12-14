@@ -1,19 +1,17 @@
 export type RedisConfig = {
-  connectionString: string;
+  connectionString: string | undefined;
   /**
    * Optional name for the connection, useful for identifying in logs or monitoring.
    *
    * @default 'default'
    */
-  connectionName: string;
+  connectionName?: string;
   /**
    * Maximum number of retries for connection attempts.
    *
    * @default 5
    */
-  maxRetries: number;
-  retryTimeout: number;
-  flushOnConnect: boolean;
+  maxRetries?: number;
+  retryTimeout?: number;
+  flushOnConnect?: boolean;
 };
-
-export type RedisConnectionConstructorProps = Partial<RedisConfig>;

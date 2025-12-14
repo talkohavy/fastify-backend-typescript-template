@@ -1,13 +1,16 @@
 import { createClient, type RedisClientType } from 'redis';
-import type { ConnectionFactory } from '../../lucky-server';
-import type { RedisConfig, RedisConnectionConstructorProps } from './types';
+import type { RedisConfig } from './types';
 
-export class RedisConnection implements ConnectionFactory {
+export class RedisConnection {
   private redisClient: RedisClientType | null = null;
   private connectionPromise: Promise<RedisClientType> | null = null;
-  private _config: RedisConfig;
+  private readonly connectionString: string;
+  private readonly connectionName: string;
+  private readonly maxRetries: number;
+  private readonly retryTimeout: number;
+  private readonly flushOnConnect: boolean;
 
-  constructor(props?: RedisConnectionConstructorProps) {
+  constructor(props?: RedisConfig) {
     const {
       connectionString = 'redis://localhost:6379',
       connectionName = 'default',
@@ -16,24 +19,26 @@ export class RedisConnection implements ConnectionFactory {
       flushOnConnect = false,
     } = props ?? {};
 
-    this._config = { connectionName, connectionString, maxRetries, retryTimeout, flushOnConnect };
+    this.connectionString = connectionString;
+    this.connectionName = connectionName;
+    this.maxRetries = maxRetries;
+    this.retryTimeout = retryTimeout;
+    this.flushOnConnect = flushOnConnect;
   }
 
-  public async connect(): Promise<RedisClientType> {
+  async connect(): Promise<RedisClientType> {
     // If already connected, return existing client
     if (this.redisClient?.isOpen) {
-      console.log(`Already connected to Redis (${this._config.connectionName})`);
       return this.redisClient;
     }
 
     // If connection is in progress, wait for it
     if (this.connectionPromise) {
-      console.log(`Connection already in progress (${this._config.connectionName}), waiting for it to resolve...`);
       return this.connectionPromise;
     }
 
     // Start new connection
-    this.connectionPromise = this.performConnection(this._config);
+    this.connectionPromise = this.performConnection();
 
     try {
       const client = await this.connectionPromise;
@@ -44,13 +49,7 @@ export class RedisConnection implements ConnectionFactory {
     }
   }
 
-  async ensureConnected(): Promise<void> {
-    if (!this.isConnected()) {
-      throw new Error(`Redis client is not connected (${this._config.connectionName})`);
-    }
-  }
-
-  private async performConnection(config: RedisConfig): Promise<RedisClientType> {
+  private async performConnection(): Promise<RedisClientType> {
     try {
       // Clean up existing client if any
       if (this.redisClient) {
@@ -58,51 +57,32 @@ export class RedisConnection implements ConnectionFactory {
       }
 
       this.redisClient = createClient({
-        url: this._config.connectionString,
+        url: this.connectionString,
         socket: {
           reconnectStrategy: (retriesSoFar: number) => {
-            const maxRetries = this._config.maxRetries || 5;
-            const retryTimeout = this._config.retryTimeout || 15000;
-
-            if (retriesSoFar >= maxRetries) {
-              console.error(
-                `Max retries (${maxRetries}) reached. Cannot connect to Redis (${this._config.connectionName}).`,
+            if (retriesSoFar >= this.maxRetries) {
+              return new Error(
+                `Max retries (${this.maxRetries}) reached. Cannot connect to Redis (${this.connectionName}).`,
               );
-              return new Error('CANNOT_CONNECT_TO_REDIS');
             }
-
-            console.warn(
-              `Retrying Redis connection (${this._config.connectionName}) (${retriesSoFar + 1}/${maxRetries}) in ${retryTimeout / 1000} seconds...`,
-            );
-
-            return retryTimeout;
+            return this.retryTimeout;
           },
         },
       });
 
-      this.redisClient.on('error', (err) => {
-        console.error(`❌ Redis connection error (${this._config.connectionName}):`, err);
-      });
-
-      this.redisClient.on('connect', () => {
-        console.log(`✅ Redis client connected (${this._config.connectionName})`);
-      });
-
-      this.redisClient.on('disconnect', () => {
-        console.warn(`🔌 Redis client disconnected (${this._config.connectionName})`);
+      this.redisClient.on('error', (_err) => {
+        // Error handling is done at plugin level via fastify.log
       });
 
       await this.redisClient.connect();
 
       // Only flush in development and when explicitly requested
-      if (process.env.NODE_ENV === 'development' && config.flushOnConnect) {
+      if (process.env.NODE_ENV === 'development' && this.flushOnConnect) {
         await this.redisClient.flushAll();
-        console.log(`FLUSHALL: Redis cache cleared successfully (${this._config.connectionName})!`);
       }
 
       return this.redisClient;
     } catch (error) {
-      console.error(`Failed to connect to Redis (${this._config.connectionName}):`, error);
       this.redisClient = null;
       throw error;
     } finally {
@@ -110,21 +90,20 @@ export class RedisConnection implements ConnectionFactory {
     }
   }
 
-  public getClient(): RedisClientType | null {
+  getClient(): RedisClientType | null {
     return this.redisClient;
   }
 
-  public isConnected(): boolean {
+  isConnected(): boolean {
     return this.redisClient?.isOpen || false;
   }
 
-  public getConnectionName(): string {
-    return this._config.connectionName;
+  getConnectionName(): string {
+    return this.connectionName;
   }
 
-  public async disconnect(): Promise<void> {
+  async disconnect(): Promise<void> {
     await this.cleanupClient();
-    console.log(`Disconnected from Redis (${this._config.connectionName})`);
   }
 
   private async cleanupClient(): Promise<void> {
@@ -134,8 +113,8 @@ export class RedisConnection implements ConnectionFactory {
           await this.redisClient.quit();
         }
         this.redisClient.removeAllListeners();
-      } catch (error) {
-        console.error(`Error during Redis cleanup (${this._config.connectionName}):`, error);
+      } catch (_error) {
+        // Cleanup errors are handled silently
       } finally {
         this.redisClient = null;
       }
