@@ -9,6 +9,7 @@ import { routesWithBodyValidation } from './modules/routes-with-body-validation'
 import { SerializationExamplesModule } from './modules/serialization-examples/serialization-examples.module';
 import { UsersModule } from './modules/users';
 import { ValidationExamplesModule } from './modules/validation-examples';
+import { cookiePlugin } from './plugins/cookie';
 import { corsPlugin } from './plugins/cors';
 import { mongodbPlugin, postgresPlugin } from './plugins/database';
 import { errorHandlerPlugin } from './plugins/errorHandler.plugin';
@@ -25,11 +26,11 @@ export async function buildApp(options?: AppOptions) {
     postgresPlugin,
     mongodbPlugin,
     corsPlugin,
+    cookiePlugin,
     // helmetPlugin,
     // requestIdPlugin,
     // bodyLimitPlugin,
     // urlEncodedPlugin,
-    // cookieParserPlugin,
   ]);
 
   appModule.registerModules(
