@@ -9,6 +9,7 @@ import { routesWithBodyValidation } from './modules/routes-with-body-validation'
 import { SerializationExamplesModule } from './modules/serialization-examples/serialization-examples.module';
 import { UsersModule } from './modules/users';
 import { ValidationExamplesModule } from './modules/validation-examples';
+import { configServicePlugin } from './plugins/config-service/config-service.plugin';
 import { cookiePlugin } from './plugins/cookie';
 import { corsPlugin } from './plugins/cors';
 import { mongodbPlugin, postgresPlugin } from './plugins/database';
@@ -22,6 +23,7 @@ export async function buildApp(options?: AppOptions) {
   const appModule = new AppFactory(app);
 
   await appModule.registerPlugins([
+    configServicePlugin,
     redisPlugin,
     postgresPlugin,
     mongodbPlugin,

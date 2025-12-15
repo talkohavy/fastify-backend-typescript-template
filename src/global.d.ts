@@ -1,5 +1,6 @@
 import type { Mongoose } from 'mongoose';
 import type { Client as PgClient } from 'pg';
+import type { ConfigService } from './lib/config-service';
 import type { RedisClients } from './plugins/database/redis.plugin';
 
 declare module 'fastify' {
@@ -8,6 +9,7 @@ declare module 'fastify' {
     pg: PgClient;
     mongo: Mongoose;
     redis: RedisClients;
+    configService: ConfigService;
   }
 
   export interface FastifyRequest {
