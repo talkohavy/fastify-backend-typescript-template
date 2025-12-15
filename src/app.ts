@@ -31,8 +31,6 @@ export async function buildApp(options?: AppOptions) {
     cookiePlugin,
     // helmetPlugin, // <--- slows down the server by nearly 50$ !!!
     // requestIdPlugin,
-    // bodyLimitPlugin,
-    // urlEncodedPlugin,
   ]);
 
   appModule.registerModules(
