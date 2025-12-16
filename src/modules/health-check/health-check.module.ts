@@ -5,7 +5,7 @@ export class HealthCheckModule {
     this.initializeModule();
   }
 
-  private async initializeModule(): Promise<void> {
+  private initializeModule(): void {
     this.attachController(this.app);
   }
 

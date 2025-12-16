@@ -18,7 +18,7 @@ export class UsersModule {
     this.initializeModule();
   }
 
-  private async initializeModule(): Promise<void> {
+  private initializeModule(): void {
     // Initialize repositories
     // this.usersRepository = new UsersMongoRepository(this.app.mongo);
     this.usersRepository = new UsersPostgresRepository(this.app.pg);

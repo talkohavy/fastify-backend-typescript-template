@@ -5,7 +5,7 @@ export class SerializationExamplesModule {
     this.initializeModule();
   }
 
-  private async initializeModule(): Promise<void> {
+  private initializeModule(): void {
     this.registerController(this.app);
   }
 
