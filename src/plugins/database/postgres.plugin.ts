@@ -24,7 +24,6 @@ async function postgresPluggable(app: FastifyInstance): Promise<void> {
     throw error;
   }
 
-  // Decorate fastify instance - accessible as app.pg
   app.decorate('pg', connection.getClient());
 
   // Graceful shutdown - Fastify calls this automatically on close
