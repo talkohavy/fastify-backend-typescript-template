@@ -1,4 +1,5 @@
 import type { FastifyInstance } from 'fastify';
+import { IS_STANDALONE_MICRO_SERVICES } from '../../common/constants';
 import { DragonsController } from './controllers/dragons.controller';
 import { DragonsService } from './services/dragons.service';
 
@@ -12,7 +13,10 @@ export class DragonsModule {
   private initializeModule(): void {
     this.dragonsService = new DragonsService(this.app.redis);
 
-    this.attachControllers(this.app);
+    // Only attach routes if running as a standalone micro-service
+    if (IS_STANDALONE_MICRO_SERVICES) {
+      this.attachControllers(this.app);
+    }
   }
 
   private attachControllers(app: FastifyInstance): void {

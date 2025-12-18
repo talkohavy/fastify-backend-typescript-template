@@ -39,6 +39,7 @@ export async function buildApp(options?: AppOptions) {
     AuthenticationModule,
     DragonsModule,
     UsersModule,
+    // Examples to be removed:
     ValidationExamplesModule,
     SerializationExamplesModule,
   ]);
