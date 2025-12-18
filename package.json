@@ -34,6 +34,7 @@
     "@fastify/redis": "^7.1.0",
     "@fastify/sensible": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "color-my-json": "^0.0.9",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0",
     "jsonwebtoken": "^9.0.3",
