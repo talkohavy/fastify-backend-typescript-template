@@ -3,6 +3,7 @@ import type { AppOptions } from './types';
 import { optimizedApp } from './common/constants';
 import { AppFactory } from './lib/lucky-server';
 import { AuthenticationModule } from './modules/authentication';
+import { BackendModule } from './modules/backend';
 import { DragonsModule } from './modules/dragons';
 import { HealthCheckModule } from './modules/health-check';
 import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
@@ -39,6 +40,7 @@ export async function buildApp(options?: AppOptions) {
     AuthenticationModule,
     DragonsModule,
     UsersModule,
+    BackendModule,
     // Examples to be removed:
     ValidationExamplesModule,
     SerializationExamplesModule,

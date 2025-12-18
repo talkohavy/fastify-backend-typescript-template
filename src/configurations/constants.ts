@@ -5,6 +5,7 @@ export const ConfigKeys = {
   AuthCookie: 'authCookie',
   Cookies: 'cookies',
   Jwt: 'jwt',
+  Services: 'services',
 } as const;
 
 type TypeOfConfigKeys = typeof ConfigKeys;
@@ -44,3 +45,16 @@ export type JwtConfig = {
   refreshExpireTime: string;
   issuer: string;
 };
+
+export const ServiceNames = {
+  Auth: 'auth',
+  Users: 'users',
+  Books: 'books',
+  Dragons: 'dragons',
+  FileUpload: 'file-upload',
+} as const;
+
+export type ServiceNameKeys = keyof typeof ServiceNames;
+export type ServiceNameValues = (typeof ServiceNames)[ServiceNameKeys];
+
+export type ServicesConfig = Record<ServiceNameValues, { baseUrl: string }>;

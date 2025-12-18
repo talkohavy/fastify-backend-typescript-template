@@ -1,4 +1,6 @@
+import type { HttpException } from '../lib/Errors/HttpException';
 import type { OptimizedApp } from './types';
+import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from '../lib/Errors';
 
 export const API_URLS = {
   healthCheck: '/api/health-check',
@@ -37,6 +39,28 @@ export const StatusCodes = {
   CONFLICT: 409,
   INTERNAL_ERROR: 500,
 } as const;
+
+type TypeOfStatusCodes = typeof StatusCodes;
+export type StatusCodeKeys = keyof TypeOfStatusCodes;
+export type StatusCodeValues = TypeOfStatusCodes[StatusCodeKeys];
+
+export const StatusCodeToError: Partial<Record<StatusCodeValues, new (...args: any[]) => HttpException>> = {
+  [StatusCodes.BAD_REQUEST]: BadRequestError,
+  [StatusCodes.UNAUTHORIZED]: UnauthorizedError,
+  [StatusCodes.FORBIDDEN]: ForbiddenError,
+  [StatusCodes.NOT_FOUND]: NotFoundError,
+  [StatusCodes.INTERNAL_ERROR]: InternalServerError,
+} as const;
+
+export const HttpMethod = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  PATCH: 'PATCH',
+  DELETE: 'DELETE',
+} as const;
+
+export type HttpMethodValues = (typeof HttpMethod)[keyof typeof HttpMethod];
 
 /**
  * Pre-defined object structure for V8 shape optimization.
