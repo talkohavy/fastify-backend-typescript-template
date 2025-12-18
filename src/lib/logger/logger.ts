@@ -3,6 +3,7 @@ import type { ILogger, LoggerConstructorProps } from './logger.interface';
 import type { LoggerSettings } from './types';
 import { LogLevel, LogLevelToNumber, type LogLevelValues } from './logic/constants';
 import { createEnumerableError } from './logic/utils/createEnumerableError';
+import { getRequestId } from './request-context';
 
 export class Logger implements ILogger {
   private readonly settings: LoggerSettings;
@@ -124,10 +125,13 @@ export class Logger implements ILogger {
   private enrichLogMetadata(message: string, extraData: Record<string, any>, level: LogLevelValues) {
     const error = extraData?.error && createEnumerableError(extraData.error);
 
+    const requestId = getRequestId();
+
     const enrichedLogMetadata = {
       _time: new Date().toISOString(),
       message,
       level,
+      requestId,
       ...extraData, // must come before error key!
       error,
       ...this.fixedKeys,

@@ -20,6 +20,7 @@ import { errorHandlerPlugin } from './plugins/errorHandler.plugin';
 import { loggerPlugin } from './plugins/logger.plugin';
 import { pathNotFoundPlugin } from './plugins/pathNotFound.plugin';
 import { redisPlugin } from './plugins/redis.plugin';
+import { requestIdPlugin } from './plugins/requestId.plugin';
 
 export async function buildApp(options?: AppOptions) {
   const app: FastifyInstance = await Fastify(options);
@@ -28,6 +29,7 @@ export async function buildApp(options?: AppOptions) {
 
   await appModule.registerPlugins([
     configServicePlugin,
+    requestIdPlugin,
     loggerPlugin,
     redisPlugin,
     postgresPlugin,
@@ -35,7 +37,6 @@ export async function buildApp(options?: AppOptions) {
     corsPlugin,
     cookiePlugin,
     // helmetPlugin, // <--- slows down the server by nearly 50% !!!
-    // requestIdPlugin,
   ]);
 
   appModule.registerModules([
