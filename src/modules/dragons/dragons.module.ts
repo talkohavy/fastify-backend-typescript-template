@@ -12,10 +12,10 @@ export class DragonsModule {
   private initializeModule(): void {
     this.dragonsService = new DragonsService(this.app.redis);
 
-    this.attachController(this.app);
+    this.attachControllers(this.app);
   }
 
-  private attachController(app: FastifyInstance): void {
+  private attachControllers(app: FastifyInstance): void {
     const dragonsController = new DragonsController(app, this.dragonsService);
 
     dragonsController.registerRoutes();

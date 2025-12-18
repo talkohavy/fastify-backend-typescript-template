@@ -6,10 +6,10 @@ export class HealthCheckModule {
   }
 
   private initializeModule(): void {
-    this.attachController(this.app);
+    this.attachControllers(this.app);
   }
 
-  private attachController(app: any): void {
+  private attachControllers(app: any): void {
     const controller = new HealthCheckController(app);
 
     controller.registerRoutes();

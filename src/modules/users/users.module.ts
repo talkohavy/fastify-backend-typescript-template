@@ -33,10 +33,10 @@ export class UsersModule {
     this.userUtilitiesService = new UserUtilitiesService(this.usersRepository, fieldScreeningService);
     this.usersCrudService = new UsersCrudService(this.usersRepository);
 
-    this.attachController();
+    this.attachControllers();
   }
 
-  private attachController(): void {
+  private attachControllers(): void {
     const userUtilitiesController = new UserUtilitiesController(this.app, this.userUtilitiesService);
     const usersCrudController = new UsersCrudController(this.app, this.usersCrudService);
 

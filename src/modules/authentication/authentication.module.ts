@@ -33,11 +33,11 @@ export class AuthenticationModule {
 
     // Only attach routes if running as a standalone micro-service
     if (IS_MICRO_SERVICES) {
-      this.attachRoutes(this.app);
+      this.attachControllers(this.app);
     }
   }
 
-  private attachRoutes(app: FastifyInstance): void {
+  private attachControllers(app: FastifyInstance): void {
     const passwordManagementController = new PasswordManagementController(app, this.passwordManagementService);
     const tokenGenerationController = new TokenGenerationController(app, this.tokenGenerationService);
     const tokenVerificationController = new TokenVerificationController(app, this.tokenVerificationService);
