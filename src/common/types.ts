@@ -1,4 +1,5 @@
 import type { AuthenticationModule } from '../modules/authentication';
+import type { BooksModule } from '../modules/books';
 import type { DragonsModule } from '../modules/dragons';
 import type { HealthCheckModule } from '../modules/health-check';
 import type { UsersModule } from '../modules/users';
@@ -8,6 +9,7 @@ export interface OptimizedApp {
     AuthenticationModule: AuthenticationModule;
     HealthCheckModule: HealthCheckModule;
     UsersModule: UsersModule;
+    BooksModule: BooksModule;
     DragonsModule: DragonsModule;
     // BooksModule: BooksModule;
     // FileUploadModule: FileUploadModule;

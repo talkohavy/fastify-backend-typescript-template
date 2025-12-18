@@ -1,0 +1,111 @@
+import type { FastifyInstance } from 'fastify';
+import type { ControllerFactory } from '../../../lib/lucky-server';
+import type { BooksService } from '../services/books.service';
+import { API_URLS, StatusCodes } from '../../../common/constants';
+
+export class BooksController implements ControllerFactory {
+  constructor(
+    private readonly app: FastifyInstance,
+    private readonly booksService: BooksService,
+  ) {}
+
+  private createBook(app: FastifyInstance) {
+    this.app.post(
+      API_URLS.books,
+      // joiBodyMiddleware(createBookSchema),
+      async (req, res) => {
+        const { body } = req as any;
+
+        app.log.info(`POST ${API_URLS.books} - creating new book`);
+
+        const newBook = await this.booksService.createBook(body);
+
+        res.status(StatusCodes.CREATED);
+        return newBook;
+      },
+    );
+  }
+
+  private getBooks(app: FastifyInstance) {
+    this.app.get(API_URLS.books, async (_req, _res) => {
+      app.log.info(`GET ${API_URLS.books} - fetching books`);
+
+      const books = await this.booksService.getBooks();
+
+      return books;
+    });
+  }
+
+  private getBookById(app: FastifyInstance) {
+    this.app.get(API_URLS.bookById, async (req, res) => {
+      const { params } = req as any;
+
+      this.app.log.info(`GET ${API_URLS.bookById} - fetching book by ID`);
+
+      const bookId = params.bookId!;
+
+      const book = await this.booksService.getBookById(bookId);
+
+      if (!book) {
+        app.log.error('Book not found', bookId);
+
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
+
+      return book;
+    });
+  }
+
+  private updateBook(app: FastifyInstance) {
+    this.app.patch(
+      API_URLS.bookById,
+      // joiBodyMiddleware(updateBookSchema),
+      async (req, res) => {
+        const { body, params } = req as any;
+
+        app.log.info(`PUT ${API_URLS.bookById} - updating book by ID`);
+
+        const bookId = params.bookId!;
+        const updatedBook = await this.booksService.updateBook(bookId, body);
+
+        if (!updatedBook) {
+          app.log.error('Book not found', bookId);
+
+          res.status(StatusCodes.NOT_FOUND);
+          return { message: 'Book not found' };
+        }
+
+        return updatedBook;
+      },
+    );
+  }
+
+  private deleteBook(app: FastifyInstance) {
+    this.app.delete(API_URLS.bookById, async (req, res) => {
+      const { params } = req as any;
+
+      app.log.info(`DELETE ${API_URLS.bookById} - deleting book by ID`);
+
+      const bookId = params.bookId!;
+      const deletedBook = await this.booksService.deleteBook(bookId);
+
+      if (!deletedBook) {
+        app.log.error('Book not found', bookId);
+
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
+
+      return { message: 'Book deleted successfully' };
+    });
+  }
+
+  registerRoutes() {
+    this.app.register(this.getBooks.bind(this));
+    this.app.register(this.getBookById.bind(this));
+    this.app.register(this.createBook.bind(this));
+    this.app.register(this.updateBook.bind(this));
+    this.app.register(this.deleteBook.bind(this));
+  }
+}

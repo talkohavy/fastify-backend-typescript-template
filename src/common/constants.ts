@@ -16,6 +16,9 @@ export const API_URLS = {
   userById: '/api/users/:userId',
   getProfile: '/api/users/get-profile',
   getUserByEmail: '/api/users/get-by-email',
+  // books
+  books: '/api/books',
+  bookById: '/api/books/:bookId',
   // dragons
   dragons: '/api/dragons',
   dragonById: '/api/dragons/:dragonId',
@@ -68,10 +71,10 @@ export type HttpMethodValues = (typeof HttpMethod)[keyof typeof HttpMethod];
 export const optimizedApp: OptimizedApp = {
   modules: {
     AuthenticationModule: null as any,
-    UsersModule: null as any,
     HealthCheckModule: null as any,
+    UsersModule: null as any,
+    BooksModule: null as any,
     DragonsModule: null as any,
-    // BooksModule: null as any,
     // FileUploadModule: null as any,
   },
 };

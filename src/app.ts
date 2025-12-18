@@ -4,6 +4,7 @@ import { optimizedApp } from './common/constants';
 import { AppFactory } from './lib/lucky-server';
 import { AuthenticationModule } from './modules/authentication';
 import { BackendModule } from './modules/backend';
+import { BooksModule } from './modules/books';
 import { DragonsModule } from './modules/dragons';
 import { HealthCheckModule } from './modules/health-check';
 import routesWithAbortCleanup from './modules/routes-with-abort-cleanup';
@@ -36,12 +37,15 @@ export async function buildApp(options?: AppOptions) {
   ]);
 
   appModule.registerModules([
+    // - Main modules:
     HealthCheckModule,
     AuthenticationModule,
     DragonsModule,
     UsersModule,
+    BooksModule,
+    // - BFF module (route provider) - requires Main modules to be ready
     BackendModule,
-    // Examples to be removed:
+    // - Examples to be removed:
     ValidationExamplesModule,
     SerializationExamplesModule,
   ]);
