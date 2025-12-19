@@ -30,9 +30,7 @@ export class UsersCrudService {
   }
 
   async getUsers(query?: GetUsersQuery): Promise<PaginatedResult<DatabaseUser>> {
-    const { filter, pagination } = query || {};
-
-    return this.usersRepository.getUsers({ filter, pagination });
+    return this.usersRepository.getUsers(query);
   }
 
   async updateUserById(userId: string, userData: UpdateUserDto): Promise<DatabaseUser> {

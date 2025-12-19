@@ -1,3 +1,4 @@
+import type { PaginatedResult } from '../../../../common/types';
 import type { CreateUserDto, UpdateUserDto } from '../../../users/services/interfaces/users.service.interface';
 import type { DatabaseUser } from '../../../users/types';
 import type { HttpClient } from '../../logic/http-client';
@@ -17,8 +18,8 @@ export class UsersHttpAdapter implements IUsersAdapter {
     return this.httpClient.get<DatabaseUser>({ serviceName: ServiceNames.Users, route: route });
   }
 
-  async getUsers(query?: any): Promise<Array<DatabaseUser>> {
-    return this.httpClient.get<Array<DatabaseUser>>({
+  async getUsers(query?: any): Promise<PaginatedResult<DatabaseUser>> {
+    return this.httpClient.get<PaginatedResult<DatabaseUser>>({
       serviceName: ServiceNames.Users,
       route: API_URLS.users,
       options: { queryParams: query },

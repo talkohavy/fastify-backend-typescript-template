@@ -1,6 +1,6 @@
 import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import type { ControllerFactory } from '../../../lib/lucky-server';
-import type { UsersCrudService } from '../services/users-crud.service';
+import type { GetUsersQuery, UsersCrudService } from '../services/users-crud.service';
 import type { CreateUserBody, UpdateUserBody, UserByIdParams } from './interfaces/users-crud.controller.interface';
 import { API_URLS, StatusCodes } from '../../../common/constants';
 import { createUserSchema } from './dto/createUserSchema.dto';
@@ -39,7 +39,7 @@ export class UsersCrudController implements ControllerFactory {
 
       app.logger.info(`GET ${API_URLS.users} - get all users`);
 
-      const users = await this.usersService.getUsers(query);
+      const users = await this.usersService.getUsers(query as GetUsersQuery);
 
       return users;
     });

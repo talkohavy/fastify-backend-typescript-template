@@ -1,3 +1,4 @@
+import type { PaginatedResult } from '../../../../common/types';
 import type { CreateUserDto, UpdateUserDto } from '../../../users/services/interfaces/users.service.interface';
 import type { UserUtilitiesService } from '../../../users/services/user-utilities.service';
 import type { UsersCrudService } from '../../../users/services/users-crud.service';
@@ -18,7 +19,7 @@ export class UsersDirectAdapter implements IUsersAdapter {
     return this.crudService.getUserById(userId);
   }
 
-  async getUsers(query?: any): Promise<Array<DatabaseUser>> {
+  async getUsers(query?: any): Promise<PaginatedResult<DatabaseUser>> {
     return this.crudService.getUsers(query);
   }
 
