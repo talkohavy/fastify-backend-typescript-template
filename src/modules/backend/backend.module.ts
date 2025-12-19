@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { IS_STANDALONE_MICRO_SERVICES } from '../../common/constants';
 import { HealthCheckController } from '../health-check/health-check.controller';
 import { AuthDirectAdapter, AuthHttpAdapter, AuthenticationController, type IAuthAdapter } from './authentication';
-// import { BooksDirectAdapter, BooksHttpAdapter, BooksController, type IBooksAdapter } from './books';
+import { BooksDirectAdapter, BooksHttpAdapter, BooksController, type IBooksAdapter } from './books';
 import { DragonsController } from './dragons';
 import { DragonsDirectAdapter, DragonsHttpAdapter, type IDragonsAdapter } from './dragons';
 // import {
@@ -30,7 +30,7 @@ import {
 export class BackendModule {
   private usersAdapter!: IUsersAdapter;
   private authAdapter!: IAuthAdapter;
-  // private booksAdapter!: IBooksAdapter;
+  private booksAdapter!: IBooksAdapter;
   private dragonsAdapter!: IDragonsAdapter;
   // private fileUploadAdapter!: IFileUploadAdapter;
 
@@ -45,7 +45,7 @@ export class BackendModule {
       const httpClient = new HttpClient(this.app.configService);
       this.usersAdapter = new UsersHttpAdapter(httpClient);
       this.authAdapter = new AuthHttpAdapter(httpClient);
-      // this.booksAdapter = new BooksHttpAdapter(httpClient);
+      this.booksAdapter = new BooksHttpAdapter(httpClient);
       this.dragonsAdapter = new DragonsHttpAdapter(httpClient);
       // this.fileUploadAdapter = new FileUploadHttpAdapter(httpClient);
     } else {
@@ -53,7 +53,7 @@ export class BackendModule {
       const { usersCrudService, userUtilitiesService } = this.app.modules.UsersModule.services;
       const { passwordManagementService, tokenGenerationService, tokenVerificationService } =
         this.app.modules.AuthenticationModule.services;
-      // const { booksService } = this.app.modules.BooksModule.services;
+      const { booksService } = this.app.modules.BooksModule.services;
       const { dragonsService } = this.app.modules.DragonsModule.services;
       // const { fileUploadService } = this.app.modules.FileUploadModule.services;
 
@@ -63,7 +63,7 @@ export class BackendModule {
         tokenGenerationService,
         tokenVerificationService,
       );
-      // this.booksAdapter = new BooksDirectAdapter(booksService);
+      this.booksAdapter = new BooksDirectAdapter(booksService);
       this.dragonsAdapter = new DragonsDirectAdapter(dragonsService);
       // this.fileUploadAdapter = new FileUploadDirectAdapter(fileUploadService);
     }
@@ -75,7 +75,7 @@ export class BackendModule {
     const authController = new AuthenticationController(this.app, this.authAdapter, this.usersAdapter);
     const usersCrudController = new UsersCrudController(this.app, this.usersAdapter, this.authAdapter);
     const userUtilitiesController = new UserUtilitiesController(this.app, this.usersAdapter, this.authAdapter);
-    // const booksController = new BooksController(this.app, this.booksAdapter);
+    const booksController = new BooksController(this.app, this.booksAdapter);
     const dragonsController = new DragonsController(this.app, this.dragonsAdapter);
     // const fileUploadController = new FileUploadController(this.app, this.fileUploadAdapter);
 
@@ -83,7 +83,7 @@ export class BackendModule {
     authController.registerRoutes();
     usersCrudController.registerRoutes();
     userUtilitiesController.registerRoutes();
-    // booksController.registerRoutes();
+    booksController.registerRoutes();
     dragonsController.registerRoutes();
     // fileUploadController.registerRoutes();
   }

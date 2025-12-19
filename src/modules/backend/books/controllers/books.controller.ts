@@ -1,0 +1,117 @@
+import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
+import type { ControllerFactory } from '../../../../lib/lucky-server';
+import type { IBooksAdapter } from '../adapters/books.adapter.interface';
+import { API_URLS, StatusCodes } from '../../../../common/constants';
+import { createBookSchema } from './dto/createBookSchema.dto';
+import { updateBookSchema } from './dto/updateBookSchema.dto';
+
+export class BooksController implements ControllerFactory {
+  constructor(
+    private readonly app: FastifyInstance,
+    private readonly booksAdapter: IBooksAdapter,
+  ) {}
+
+  private createBook(app: FastifyInstance) {
+    const createBookOptions: RouteShorthandOptions = {
+      schema: {
+        body: createBookSchema,
+      },
+    };
+
+    this.app.post(API_URLS.books, createBookOptions, async (req, res) => {
+      const { body } = req as any;
+
+      app.logger.info(`POST ${API_URLS.books} - creating new book`);
+
+      const newBook = await this.booksAdapter.createBook(body);
+
+      res.status(StatusCodes.CREATED);
+      return newBook;
+    });
+  }
+
+  private getBooks(app: FastifyInstance) {
+    this.app.get(API_URLS.books, async (_req, _res) => {
+      app.logger.info(`GET ${API_URLS.books} - fetching books`);
+
+      const books = await this.booksAdapter.getBooks();
+
+      return books;
+    });
+  }
+
+  private getBookById(app: FastifyInstance) {
+    this.app.get(API_URLS.bookById, async (req, res) => {
+      const { params } = req as any;
+
+      this.app.logger.info(`GET ${API_URLS.bookById} - fetching book by ID`);
+
+      const bookId = params.bookId!;
+
+      const book = await this.booksAdapter.getBookById(bookId);
+
+      if (!book) {
+        app.logger.error('Book not found', bookId);
+
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
+
+      return book;
+    });
+  }
+
+  private updateBook(app: FastifyInstance) {
+    const updateBookOptions: RouteShorthandOptions = {
+      schema: {
+        body: updateBookSchema,
+      },
+    };
+
+    this.app.patch(API_URLS.bookById, updateBookOptions, async (req, res) => {
+      const { body, params } = req as any;
+
+      app.logger.info(`PATCH ${API_URLS.bookById} - updating book by ID`);
+
+      const bookId = params.bookId!;
+      const updatedBook = await this.booksAdapter.updateBook(bookId, body);
+
+      if (!updatedBook) {
+        app.logger.error('Book not found', bookId);
+
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
+
+      return updatedBook;
+    });
+  }
+
+  private deleteBook(app: FastifyInstance) {
+    this.app.delete(API_URLS.bookById, async (req, res) => {
+      const { params } = req as any;
+
+      app.logger.info(`DELETE ${API_URLS.bookById} - deleting book by ID`);
+
+      const bookId = params.bookId!;
+      const deletedBook = await this.booksAdapter.deleteBook(bookId);
+
+      if (!deletedBook) {
+        app.logger.error('Book not found', bookId);
+
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
+
+      return { message: 'Book deleted successfully' };
+    });
+  }
+
+  registerRoutes() {
+    this.app.register(this.getBooks.bind(this));
+    this.app.register(this.getBookById.bind(this));
+    this.app.register(this.createBook.bind(this));
+    this.app.register(this.updateBook.bind(this));
+    this.app.register(this.deleteBook.bind(this));
+  }
+}
