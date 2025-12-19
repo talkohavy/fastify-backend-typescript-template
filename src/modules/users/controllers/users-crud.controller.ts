@@ -3,6 +3,9 @@ import type { ControllerFactory } from '../../../lib/lucky-server';
 import type { UsersCrudService } from '../services/users-crud.service';
 import type { CreateUserBody, UpdateUserBody, UserByIdParams } from './interfaces/users-crud.controller.interface';
 import { API_URLS, StatusCodes } from '../../../common/constants';
+import { createUserSchema } from './dto/createUserSchema.dto';
+import { updateUserSchema } from './dto/updateUserSchema.dto';
+import { userByIdParamsSchema } from './dto/userByIdParamsSchema.dto';
 
 export class UsersCrudController implements ControllerFactory {
   constructor(
@@ -11,22 +14,13 @@ export class UsersCrudController implements ControllerFactory {
   ) {}
 
   private createUser(app: FastifyInstance) {
-    const options: RouteShorthandOptions = {
+    const createUserOptions: RouteShorthandOptions = {
       schema: {
-        body: {
-          type: 'object',
-          required: ['email', 'password'],
-          properties: {
-            email: { type: 'string', format: 'email' },
-            password: { type: 'string', pattern: '^[a-zA-Z0-9]{1,30}$' },
-            nickname: { type: 'string', minLength: 3, maxLength: 30 },
-            dateOfBirth: { type: 'string', format: 'date' },
-          },
-        },
+        body: createUserSchema,
       },
     };
 
-    app.post(API_URLS.users, options, async (req, res) => {
+    app.post(API_URLS.users, createUserOptions, async (req, res) => {
       const { body } = req;
 
       app.logger.info(`POST ${API_URLS.users} - create new user`);
@@ -52,19 +46,13 @@ export class UsersCrudController implements ControllerFactory {
   }
 
   private getUserById(app: FastifyInstance) {
-    const options: RouteShorthandOptions = {
+    const getUserByIdOptions: RouteShorthandOptions = {
       schema: {
-        params: {
-          type: 'object',
-          required: ['userId'],
-          properties: {
-            userId: { type: 'string' },
-          },
-        },
+        params: userByIdParamsSchema,
       },
     };
 
-    app.get(API_URLS.userById, options, async (req, _res) => {
+    app.get(API_URLS.userById, getUserByIdOptions, async (req, _res) => {
       const { params } = req;
 
       app.logger.info(`GET ${API_URLS.userById} - get user by id`);
@@ -78,28 +66,14 @@ export class UsersCrudController implements ControllerFactory {
   }
 
   private updateUserById(app: FastifyInstance) {
-    const options: RouteShorthandOptions = {
+    const updateUserByIdOptions: RouteShorthandOptions = {
       schema: {
-        params: {
-          type: 'object',
-          required: ['userId'],
-          properties: {
-            userId: { type: 'string' },
-          },
-        },
-        body: {
-          type: 'object',
-          minProperties: 1,
-          properties: {
-            email: { type: 'string', format: 'email' },
-            nickname: { type: 'string', minLength: 1, maxLength: 30 },
-            dateOfBirth: { type: 'string', format: 'date' },
-          },
-        },
+        params: userByIdParamsSchema,
+        body: updateUserSchema,
       },
     };
 
-    app.patch(API_URLS.userById, options, async (req, _res) => {
+    app.patch(API_URLS.userById, updateUserByIdOptions, async (req, _res) => {
       const { params, body } = req;
 
       app.logger.info(`PATCH ${API_URLS.userById} - updating user by ID`);
@@ -113,19 +87,13 @@ export class UsersCrudController implements ControllerFactory {
   }
 
   private deleteUserById(app: FastifyInstance) {
-    const options: RouteShorthandOptions = {
+    const deleteUserByIdOptions: RouteShorthandOptions = {
       schema: {
-        params: {
-          type: 'object',
-          required: ['userId'],
-          properties: {
-            userId: { type: 'string' },
-          },
-        },
+        params: userByIdParamsSchema,
       },
     };
 
-    app.delete(API_URLS.userById, options, async (req, _res) => {
+    app.delete(API_URLS.userById, deleteUserByIdOptions, async (req, _res) => {
       const { params } = req;
 
       app.logger.info(`DELETE ${API_URLS.userById} - delete user`);
