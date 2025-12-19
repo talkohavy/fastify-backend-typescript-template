@@ -1,4 +1,5 @@
 import { buildApp } from './app';
+import { ConfigKeys } from './configurations';
 
 async function startServer() {
   const app = await buildApp();
@@ -6,10 +7,9 @@ async function startServer() {
   try {
     await app.listen({ port: 8000 });
 
-    const address = app.server.address();
-    const port = typeof address === 'string' ? address : address?.port;
+    const PORT = app.configService.get<number>(ConfigKeys.Port);
 
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port ${PORT}`);
   } catch (error: any) {
     app.logger.error(error.message, { error });
     process.exit(1);
