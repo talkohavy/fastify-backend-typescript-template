@@ -9,9 +9,12 @@ import type {
   UpdateUserDto,
   GetUserByEmailOptions,
 } from './interfaces/users.repository.interface';
-import { DEFAULT_PAGINATION } from '../../../common/constants';
-import { calculateOffset } from '../../../common/utils/pagination/calculateOffset';
 import { createPaginationMeta } from '../../../common/utils/pagination/createPaginationMeta';
+import { parsePaginationParams } from '../../../common/utils/pagination/parsePaginationParams';
+import { buildWhereClause } from '../../../database/postgres/buildWhereClause';
+
+const ALLOWED_SORT_COLUMNS = new Set(['id', 'email', 'nickname', 'created_at', 'updated_at', 'date_of_birth']);
+const ALLOWED_FILTER_COLUMNS = new Set(['id', 'email', 'nickname', 'is_active']);
 
 export class UsersPostgresRepository implements IUsersRepository {
   constructor(private readonly pgClient: Client) {
@@ -74,45 +77,46 @@ export class UsersPostgresRepository implements IUsersRepository {
 
   async getUsers(props?: GetUsersProps): Promise<PaginatedResult<DatabaseUser>> {
     const { filter, pagination } = props || {};
-    const {
-      page = DEFAULT_PAGINATION.page,
-      limit = DEFAULT_PAGINATION.limit,
-      sortOrder = DEFAULT_PAGINATION.sortOrder,
-      sortBy = 'id',
-    } = pagination || {};
 
-    const offset = calculateOffset(page, limit);
+    const { page, limit, offset, sortBy, sortOrder } = parsePaginationParams(pagination, {
+      allowedSortFields: ALLOWED_SORT_COLUMNS,
+      defaultSortField: 'id',
+    });
 
-    let baseQuery = 'FROM users';
-    const values: unknown[] = [];
-    let paramCount = 0;
+    const { whereClause, values } = buildWhereClause(filter, ALLOWED_FILTER_COLUMNS);
 
-    // Build WHERE clause
-    if (filter && Object.keys(filter).length > 0) {
-      const conditions = Object.keys(filter).map((key) => {
-        paramCount++;
-        values.push(filter[key]);
-        return `${key} = $${paramCount}`;
-      });
-      baseQuery += ` WHERE ${conditions.join(' AND ')}`;
-    }
-
-    // Count query for total items
-    const countQuery = `SELECT COUNT(*) ${baseQuery}`;
-    const countResult = await this.pgClient.query(countQuery, values);
-    const totalItems = Number.parseInt(countResult.rows[0].count, 10);
-
-    // Data query with sorting and pagination
-    let dataQuery = `SELECT * ${baseQuery}`;
-    dataQuery += ` ORDER BY ${sortBy} ${sortOrder.toUpperCase()}`;
-    dataQuery += ` LIMIT ${limit} OFFSET ${offset}`;
-
-    const dataResult = await this.pgClient.query(dataQuery, values);
+    const totalItems = await this.countUsers(whereClause, values);
+    const users = await this._fetchUsers(whereClause, values, { sortBy, sortOrder, limit, offset });
 
     return {
-      data: dataResult.rows as DatabaseUser[],
+      data: users,
       meta: createPaginationMeta(totalItems, page, limit),
     };
+  }
+
+  private async countUsers(whereClause: string, values: unknown[]): Promise<number> {
+    const query = `SELECT COUNT(*) FROM users ${whereClause}`;
+    const result = await this.pgClient.query(query, values);
+    return Number.parseInt(result.rows[0].count, 10);
+  }
+
+  private async _fetchUsers(
+    whereClause: string,
+    values: unknown[],
+    options: { sortBy: string; sortOrder: 'asc' | 'desc'; limit: number; offset: number },
+  ): Promise<DatabaseUser[]> {
+    const { sortBy, sortOrder, limit, offset } = options;
+    const orderDirection = sortOrder === 'asc' ? 'ASC' : 'DESC';
+
+    const query = `
+      SELECT * FROM users 
+      ${whereClause}
+      ORDER BY ${sortBy} ${orderDirection}
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    const result = await this.pgClient.query(query, values);
+    return result.rows as DatabaseUser[];
   }
 
   async getUserById(userId: string, _options: GetUserByIdOptions = {}): Promise<DatabaseUser | null> {
