@@ -4,7 +4,13 @@ import { buildApp } from './app';
 import { ConfigKeys } from './configurations';
 
 async function startServer() {
-  const app = await buildApp();
+  const app = await buildApp({
+    ajv: {
+      customOptions: {
+        removeAdditional: false, // <--- defaults to `true`. true remove additional keys added to object, thus refraining from throwing an error. Setting this to `false` makes validation fail & throw instead.
+      },
+    },
+  });
 
   try {
     await app.listen({ port: 8000 });

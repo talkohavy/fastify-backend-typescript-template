@@ -6,4 +6,5 @@ export const createBookSchema = {
     author: { type: 'string' },
     publishedYear: { type: 'integer', minimum: 1900, maximum: 2023 },
   },
+  additionalProperties: false, // <--- defaults to `true`. Prevents unexpected properties from being added to the object. Will not throw an error if the object has additional properties, it will simply remove them.
 } as const;
