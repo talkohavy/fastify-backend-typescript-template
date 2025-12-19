@@ -64,7 +64,7 @@ export class BooksController implements ControllerFactory {
       async (req, res) => {
         const { body, params } = req as any;
 
-        app.logger.info(`PUT ${API_URLS.bookById} - updating book by ID`);
+      app.logger.info(`PATCH ${API_URLS.bookById} - updating book by ID`);
 
         const bookId = params.bookId!;
         const updatedBook = await this.booksService.updateBook(bookId, body);

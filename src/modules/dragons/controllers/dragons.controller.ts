@@ -62,7 +62,7 @@ export class DragonsController implements ControllerFactory {
     app.patch(API_URLS.dragonById, async (req, res) => {
       const { params, body } = req as any;
 
-      app.logger.info(`PUT ${API_URLS.dragonById} - updating dragon by ID`);
+      app.logger.info(`PATCH ${API_URLS.dragonById} - updating dragon by ID`);
 
       const dragonId = params.dragonId as string;
       const dragon = body as UpdateDragonDto;
