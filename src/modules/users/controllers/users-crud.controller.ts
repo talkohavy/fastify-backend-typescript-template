@@ -1,10 +1,11 @@
 import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import type { ControllerFactory } from '../../../lib/lucky-server';
-import type { GetUsersQueryDto } from '../services/interfaces/users.service.interface';
+import type { GetUsersQueryParams } from '../services/interfaces/users.service.interface';
 import type { UsersCrudService } from '../services/users-crud.service';
 import type { CreateUserBody, UpdateUserBody, UserByIdParams } from './interfaces/users-crud.controller.interface';
 import { API_URLS, StatusCodes } from '../../../common/constants';
 import { createUserSchema } from './dto/createUserSchema.dto';
+import { getUsersQuerySchema } from './dto/getUsersQuerySchema.dto';
 import { updateUserSchema } from './dto/updateUserSchema.dto';
 import { userByIdParamsSchema } from './dto/userByIdParamsSchema.dto';
 
@@ -35,12 +36,18 @@ export class UsersCrudController implements ControllerFactory {
   }
 
   private getUsers(app: FastifyInstance) {
-    app.get(API_URLS.users, async (req, _res) => {
+    const getUsersOptions: RouteShorthandOptions = {
+      schema: {
+        querystring: getUsersQuerySchema,
+      },
+    };
+
+    app.get(API_URLS.users, getUsersOptions, async (req, _res) => {
       const { query } = req;
 
       app.logger.info(`GET ${API_URLS.users} - get all users`);
 
-      const users = await this.usersService.getUsers(query as GetUsersQueryDto);
+      const users = await this.usersService.getUsers(query as GetUsersQueryParams);
 
       return users;
     });
