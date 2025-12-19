@@ -1,7 +1,9 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import type { ControllerFactory } from '../../../lib/lucky-server';
 import type { BooksService } from '../services/books.service';
 import { API_URLS, StatusCodes } from '../../../common/constants';
+import { createBookSchema } from './dto/createBook.dto';
+import { updateBookSchema } from './dto/updatedBook.dto';
 
 export class BooksController implements ControllerFactory {
   constructor(
@@ -10,20 +12,22 @@ export class BooksController implements ControllerFactory {
   ) {}
 
   private createBook(app: FastifyInstance) {
-    this.app.post(
-      API_URLS.books,
-      // joiBodyMiddleware(createBookSchema),
-      async (req, res) => {
-        const { body } = req as any;
-
-        app.logger.info(`POST ${API_URLS.books} - creating new book`);
-
-        const newBook = await this.booksService.createBook(body);
-
-        res.status(StatusCodes.CREATED);
-        return newBook;
+    const createBookOptions: RouteShorthandOptions = {
+      schema: {
+        body: createBookSchema,
       },
-    );
+    };
+
+    this.app.post(API_URLS.books, createBookOptions, async (req, res) => {
+      const { body } = req as any;
+
+      app.logger.info(`POST ${API_URLS.books} - creating new book`);
+
+      const newBook = await this.booksService.createBook(body);
+
+      res.status(StatusCodes.CREATED);
+      return newBook;
+    });
   }
 
   private getBooks(app: FastifyInstance) {
@@ -58,27 +62,29 @@ export class BooksController implements ControllerFactory {
   }
 
   private updateBook(app: FastifyInstance) {
-    this.app.patch(
-      API_URLS.bookById,
-      // joiBodyMiddleware(updateBookSchema),
-      async (req, res) => {
-        const { body, params } = req as any;
+    const updateBookOptions: RouteShorthandOptions = {
+      schema: {
+        body: updateBookSchema,
+      },
+    };
+
+    this.app.patch(API_URLS.bookById, updateBookOptions, async (req, res) => {
+      const { body, params } = req as any;
 
       app.logger.info(`PATCH ${API_URLS.bookById} - updating book by ID`);
 
-        const bookId = params.bookId!;
-        const updatedBook = await this.booksService.updateBook(bookId, body);
+      const bookId = params.bookId!;
+      const updatedBook = await this.booksService.updateBook(bookId, body);
 
-        if (!updatedBook) {
-          app.logger.error('Book not found', bookId);
+      if (!updatedBook) {
+        app.logger.error('Book not found', bookId);
 
-          res.status(StatusCodes.NOT_FOUND);
-          return { message: 'Book not found' };
-        }
+        res.status(StatusCodes.NOT_FOUND);
+        return { message: 'Book not found' };
+      }
 
-        return updatedBook;
-      },
-    );
+      return updatedBook;
+    });
   }
 
   private deleteBook(app: FastifyInstance) {

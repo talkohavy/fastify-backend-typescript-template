@@ -1,6 +1,5 @@
-export const createBookSchema = {
+export const updateDragonSchema = {
   type: 'object',
-  required: ['name', 'author', 'publishedYear'],
   properties: {
     name: { type: 'string', minLength: 1, maxLength: 40 },
     author: { type: 'string' },

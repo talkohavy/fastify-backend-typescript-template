@@ -1,7 +1,8 @@
-import Joi from 'joi';
-
-export const updateBookSchema = Joi.object({
-  name: Joi.string().min(1).max(40),
-  author: Joi.string(),
-  publishedYear: Joi.number().integer().min(1900).max(2023),
-});
+export const updateBookSchema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string', minLength: 1, maxLength: 40 },
+    author: { type: 'string' },
+    publishedYear: { type: 'integer', minimum: 1900, maximum: 2023 },
+  },
+} as const;

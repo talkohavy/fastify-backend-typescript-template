@@ -1,14 +1,35 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, RouteShorthandOptions } from 'fastify';
 import type { ControllerFactory } from '../../../lib/lucky-server';
 import type { DragonsService } from '../services/dragons.service';
 import type { UpdateDragonDto } from '../services/interfaces/dragons.service.interface';
 import { API_URLS, StatusCodes } from '../../../common/constants';
+import { createDragonSchema } from './dto/createDragonSchema.dto';
+import { updateDragonSchema } from './dto/updateDragonSchema.dto';
 
 export class DragonsController implements ControllerFactory {
   constructor(
     private readonly app: FastifyInstance,
     private readonly dragonService: DragonsService,
   ) {}
+
+  private createDragon(app: FastifyInstance) {
+    const createDragonOptions: RouteShorthandOptions = {
+      schema: {
+        body: createDragonSchema,
+      },
+    };
+
+    app.post(API_URLS.dragons, createDragonOptions, async (req, res) => {
+      const { body } = req as any;
+
+      app.logger.info(`POST ${API_URLS.dragons} - creating new dragon`);
+
+      const newDragon = await this.dragonService.createDragon(body);
+
+      res.status(StatusCodes.CREATED);
+      return newDragon;
+    });
+  }
 
   private getDragons(app: FastifyInstance) {
     app.get(API_URLS.dragons, async (_req, _res) => {
@@ -41,25 +62,14 @@ export class DragonsController implements ControllerFactory {
     });
   }
 
-  private createDragon(app: FastifyInstance) {
-    app.post(
-      API_URLS.dragons,
-      // joiBodyMiddleware(createDragonSchema),
-      async (req, res) => {
-        const { body } = req as any;
-
-        app.logger.info(`POST ${API_URLS.dragons} - creating new dragon`);
-
-        const newDragon = await this.dragonService.createDragon(body);
-
-        res.status(StatusCodes.CREATED);
-        return newDragon;
-      },
-    );
-  }
-
   private updateDragon(app: FastifyInstance) {
-    app.patch(API_URLS.dragonById, async (req, res) => {
+    const updateDragonOptions: RouteShorthandOptions = {
+      schema: {
+        body: updateDragonSchema,
+      },
+    };
+
+    app.patch(API_URLS.dragonById, updateDragonOptions, async (req, res) => {
       const { params, body } = req as any;
 
       app.logger.info(`PATCH ${API_URLS.dragonById} - updating dragon by ID`);

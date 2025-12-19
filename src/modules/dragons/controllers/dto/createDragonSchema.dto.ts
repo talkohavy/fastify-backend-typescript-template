@@ -1,4 +1,4 @@
-export const createBookSchema = {
+export const createDragonSchema = {
   type: 'object',
   required: ['name', 'author', 'publishedYear'],
   properties: {
